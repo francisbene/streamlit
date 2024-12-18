@@ -2,9 +2,9 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
+st.subheader("_Minha Planilha_ de :blue[Receitas] e :red[Despesas] :sunglasses:")
 
-st.title("Hello, Streamlit!")
-st.write("This is a simple Streamlit app.")
+st.write("Este é um app simples de gestão financeira.")
 
 if st.button('Say hello'):
     st.write('Hello, Streamlit!')
@@ -49,3 +49,14 @@ df['color'] = np.where(df.team=='A',colorA+f'{alphaA:02x}',colorB+f'{alphaB:02x}
 df['size'] = np.where(df.team=='A',sizeA, sizeB)
 
 st.map(df, size='size', color='color')
+
+
+
+
+st.subheader("_Streamlit_ is :blue[cool] :sunglasses:")
+st.subheader("This is a subheader with a divider", divider="gray")
+st.subheader("These subheaders have rotating dividers", divider=True)
+st.subheader("One", divider=True)
+st.subheader("Two", divider=True)
+st.subheader("Three", divider=True)
+st.subheader("Four", divider=True)

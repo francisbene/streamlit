@@ -7,25 +7,27 @@ st.subheader("_Minha Planilha_ de :blue[Receitas] e :red[Despesas] :sunglasses:"
 
 st.write("Este é um app simples de gestão financeira.")
 
+
 # Inicializa o estado da sessão
 memoria = st.session_state
 
 if "dicionario_gestao" not in memoria:
     memoria.dicionario_gestao = {"Despesas": {}, "Receitas": {}}
 
-# Entrada de dados
-despesa = st.text_input('Despesa')
-valor_despesa = st.number_input('Valor da Despesa', min_value=0.0, step=0.01)
-receita = st.text_input('Receita')
-valor_receita = st.number_input('Valor da Receita', min_value=0.0, step=0.01)
+# Barra lateral para inserção de dados
+st.sidebar.header("Adicionar Nova Transação")
 
-# Adiciona despesas e receitas ao dicionário
-if st.button('Adicionar Despesa'):
-    if despesa:
-        memoria.dicionario_gestao["Despesas"][despesa] = valor_despesa
-if st.button('Adicionar Receita'):
-    if receita:
-        memoria.dicionario_gestao["Receitas"][receita] = valor_receita
+# Entrada de dados na barra lateral
+tipo_transacao = st.sidebar.selectbox('Tipo de Transação', ['Despesa', 'Receita'])
+nome = st.sidebar.text_input('Nome')
+valor = st.sidebar.number_input('Valor', min_value=0.0, step=0.01)
+
+# Adiciona transações ao dicionário
+if st.sidebar.button('Adicionar'):
+    if tipo_transacao == 'Despesa' and nome:
+        memoria.dicionario_gestao["Despesas"][nome] = valor
+    elif tipo_transacao == 'Receita' and nome:
+        memoria.dicionario_gestao["Receitas"][nome] = valor
 
 # Exibe as tabelas de despesas e receitas
 st.subheader("Despesas")
@@ -54,33 +56,29 @@ if st.button('Limpar Histórico'):
     memoria.dicionario_gestao = {"Despesas": {}, "Receitas": {}}
     st.write('Histórico limpo!')
 
-# Gráficos
-st.subheader("Gráficos")
-fig, ax = plt.subplots(1, 2, figsize=(10, 4))
+# Seleção de gráfico na barra lateral
+st.sidebar.header("Visualização de Gráficos")
+opcao_grafico = st.sidebar.selectbox('Selecionar Gráfico', ['Despesas', 'Receitas'])
 
-# Gráfico de barras das despesas
-ax[0].bar(memoria.dicionario_gestao["Despesas"].keys(), memoria.dicionario_gestao["Despesas"].values(), color='red')
-ax[0].set_title('Despesas')
-ax[0].set_ylabel('Valor (R$)')
-ax[0].tick_params(axis='x', rotation=45)
-
-# Gráfico de barras das receitas
-ax[1].bar(memoria.dicionario_gestao["Receitas"].keys(), memoria.dicionario_gestao["Receitas"].values(), color='green')
-ax[1].set_title('Receitas')
-ax[1].set_ylabel('Valor (R$)')
-ax[1].tick_params(axis='x', rotation=45)
-
-st.pyplot(fig)
-
-# Gráficos usando Streamlit
+# Gráficos usando matplotlib e Streamlit
 st.subheader("Gráficos")
 
 # Cria DataFrames para despesas e receitas
 df_despesas = pd.DataFrame(memoria.dicionario_gestao["Despesas"].items(), columns=["Despesa", "Valor"]).set_index("Despesa")
 df_receitas = pd.DataFrame(memoria.dicionario_gestao["Receitas"].items(), columns=["Receita", "Valor"]).set_index("Receita")
 
-# Exibe gráficos de barras para despesas e receitas
-st.bar_chart(df_despesas, use_container_width=True)
-st.bar_chart(df_receitas, use_container_width=True)
-
-
+# Exibe o gráfico selecionado
+if opcao_grafico == 'Despesas':
+    fig, ax = plt.subplots()
+    ax.bar(df_despesas.index, df_despesas['Valor'], color='red')
+    ax.set_title('Despesas')
+    ax.set_ylabel('Valor (R$)')
+    ax.tick_params(axis='x', rotation=45)
+    st.pyplot(fig)
+elif opcao_grafico == 'Receitas':
+    fig, ax = plt.subplots()
+    ax.bar(df_receitas.index, df_receitas['Valor'], color='green')
+    ax.set_title('Receitas')
+    ax.set_ylabel('Valor (R$)')
+    ax.tick_params(axis='x', rotation=45)
+    st.pyplot(fig)
